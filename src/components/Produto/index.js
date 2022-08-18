@@ -3,8 +3,7 @@ import { memo, useContext } from 'react';
 import { IconButton } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
-import { useCarrinhoContext } from 'common/contexts/Carrinho';
-import { UsuarioContext } from 'common/contexts/Usuario';
+import { CartContext } from '../../common/contexts/Cart'
 
 function Produto({
   nome,
@@ -13,44 +12,49 @@ function Produto({
   valor,
   unidade
 }) {
-  const { carrinho, adicionarProduto, removerProduto, valorTotal } = useCarrinhoContext();
-  const { saldo } = useContext(UsuarioContext);
-  const itemNoCarrinho = carrinho.find(item => item.id === id);
+
+  const { cart, setCart } = useContext(CartContext)
+
+  const handleAddProducts = (newItem) => {
+    const hasItem = cart?.some(itemCar => itemCar.id === newItem.id)
+
+    if (!hasItem) {
+      newItem.count = 1
+      return setCart(itemPrev => [...itemPrev, newItem])
+    }
+
+    setCart(itemPrev => itemPrev.map(itemCar => {
+      if (itemCar.id === newItem.id) itemCar.count += 1
+      return itemCar
+    }))
+  }
   return (
-      <Container>
-        <div>
-          <img
-            src={`/assets/${foto}.png`}
-            alt={`foto de ${nome}`}
+    <Container>
+      <div>
+        <img
+          src={`/assets/${foto}.png`}
+          alt={`foto de ${nome}`}
+        />
+        <p>
+          {nome} - R$ {valor?.toFixed(2)} <span>Kg</span>
+        </p>
+      </div>
+      <div>
+        <IconButton
+          color="secondary"
+        >
+          <RemoveIcon />
+        </IconButton>
+
+        <IconButton
+          color="primary"
+          onClick={() => handleAddProducts({ nome, foto, id, valor })}
+        >
+          <AddIcon
           />
-          <p>
-            {nome} - R$ {valor?.toFixed(2)} <span>Kg</span>
-          </p>
-        </div>
-        <div>
-          <IconButton
-            onClick={() => removerProduto(id)}
-            disabled={!itemNoCarrinho || itemNoCarrinho.quantidade === 0}
-            color="secondary"
-          >
-            <RemoveIcon />
-          </IconButton>
-          {itemNoCarrinho?.quantidade || 0}
-          <IconButton
-            disabled={valorTotal > saldo}
-            onClick={() => adicionarProduto({
-              nome,
-              foto,
-              id,
-              valor,
-              unidade
-            })}
-            color="primary"
-          >
-            <AddIcon />
-          </IconButton>
-        </div>
-      </Container>
+        </IconButton>
+      </div>
+    </Container>
   )
 }
 

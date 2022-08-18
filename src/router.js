@@ -1,30 +1,27 @@
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Login from 'pages/Login';
 import Feira from 'pages/Feira';
-import UsuarioProvider from 'common/contexts/Usuario';
-import CarrinhoProvider from 'common/contexts/Carrinho';
 import Carrinho from 'pages/Carrinho';
-import { PagamentoProvider } from 'common/contexts/Pagamento';
+import UserContextProvider from 'common/contexts/User';
+import CartContenxtProvider from 'common/contexts/Cart';
 
 export default function Routes() {
   return (
     <Router>
       <Switch>
-        <PagamentoProvider>
-          <UsuarioProvider>
-            <Route exact path="/">
-              <Login />
+        <UserContextProvider>
+          <Route exact path="/">
+            <Login />
+          </Route>
+          <CartContenxtProvider>
+            <Route path="/feira">
+              <Feira />
             </Route>
-            <CarrinhoProvider>
-              <Route path="/feira">
-                <Feira />
-              </Route>
-              <Route path="/carrinho">
-                <Carrinho />
-              </Route>
-            </CarrinhoProvider>
-          </UsuarioProvider>
-        </PagamentoProvider>
+          </CartContenxtProvider>
+        </UserContextProvider>
+        <Route path="/carrinho">
+          <Carrinho />
+        </Route>
       </Switch>
     </Router>
   )
